@@ -1,3 +1,6 @@
+# MNIST data
+data/*
+
 # Created by https://www.gitignore.io/api/vim,linux,python,sublimetext
 
 ### Linux ###
