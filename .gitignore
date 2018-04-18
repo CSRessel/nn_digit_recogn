@@ -1,5 +1,7 @@
-# MNIST data
+# MNIST data, model data
 data/*
+MNIST_data/*
+tmp/*
 
 # Created by https://www.gitignore.io/api/vim,linux,python,sublimetext
 
