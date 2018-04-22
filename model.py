@@ -20,7 +20,7 @@ print("\nImporting MNIST dataset...\n")
 
 mnist = input_data.read_data_sets('MNIST_data')
 
-config = tf.estimator.RunConfig(log_step_count_steps=1000)
+config = tf.estimator.RunConfig(log_step_count_steps=LOG_STEP_COUNT_STEPS)
 feature_columns = [tf.feature_column.numeric_column("x", shape=[784])]
 classifier = tf.estimator.DNNClassifier(
         feature_columns=feature_columns,
@@ -34,7 +34,7 @@ train_input_fn = tf.estimator.inputs.numpy_input_fn(
       x={"x": np.array(mnist.train.images)},
       y=np.array(mnist.train.labels).astype(np.int32),
       num_epochs=None,
-	  batch_size=50,
+	  batch_size=BATCH_SIZE,
       shuffle=True)
 
 test_input_fn = tf.estimator.inputs.numpy_input_fn(
@@ -46,7 +46,7 @@ test_input_fn = tf.estimator.inputs.numpy_input_fn(
 print("\nTraining classifier...\n")
 
 start = time.clock()
-classifier.train(input_fn=train_input_fn, steps=100000)
+classifier.train(input_fn=train_input_fn, steps=STEPS)
 finish = time.clock()
 
 wall_time = finish - start
