@@ -17,7 +17,8 @@ logging.getLogger().setLevel(logging.INFO)
 
 from constants import *
 
-percentage_flipped_labels = float(sys.argv[1])
+percentage_noisy_labels = float(sys.argv[1])
+test_sample_noise_factor = float(sys.argv[2])
 
 print("\nImporting MNIST dataset...\n")
 
@@ -36,7 +37,7 @@ classifier = tf.estimator.DNNClassifier(
 # add noise to labels in training set
 labels = np.array(mnist.train.labels).astype(np.int32)
 num_samples = labels.shape[0]
-num_noisy_labels = num_samples * percentage_flipped_labels
+num_noisy_labels = num_samples * percentage_noisy_labels
 garbled_labels = random.sample(range(num_samples), int(num_noisy_labels))
 for i in garbled_labels:
 	inc_labels = [np.int32(i) for i in range(10)]
@@ -51,8 +52,24 @@ train_input_fn = tf.estimator.inputs.numpy_input_fn(
 	  batch_size=50,
       shuffle=True)
 
+test_samples = np.array(mnist.test.images)
+
 test_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": np.array(mnist.test.images)},
+      x={"x": test_samples},
+      y=np.array(mnist.test.labels).astype(np.int32),
+      num_epochs=1,
+      shuffle=False)
+
+def noisify(x, weight):
+	rand = np.random.rand(*x.shape)
+	return x * (1. - weight) + rand * weight
+
+noisy_test_samples = np.zeros(test_samples.shape)
+for i in range(test_samples.shape[0]):
+	noisy_test_samples[i] = noisify(test_samples[i], test_sample_noise_factor)
+
+noisy_test_input_fn = tf.estimator.inputs.numpy_input_fn(
+      x={"x": noisy_test_samples},
       y=np.array(mnist.test.labels).astype(np.int32),
       num_epochs=1,
       shuffle=False)
@@ -67,4 +84,6 @@ wall_time = finish - start
 
 score = classifier.evaluate(input_fn=test_input_fn)['accuracy']
 print("\nTest Accuracy: {0:f}\n".format(score))
+score = classifier.evaluate(input_fn=noisy_test_input_fn)['accuracy']
+print("\nNoisy Test Accuracy: {0:f}\n".format(score))
 print("\nTraining Time: {0:f}\n".format(wall_time))
