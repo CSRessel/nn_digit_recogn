@@ -24,7 +24,7 @@ config = tf.estimator.RunConfig(log_step_count_steps=LOG_STEP_COUNT_STEPS)
 feature_columns = [tf.feature_column.numeric_column("x", shape=[784])]
 classifier = tf.estimator.DNNClassifier(
         feature_columns=feature_columns,
-        hidden_units=([HIDDEN_UNIT_WIDTH] * HIDDEN_UNIT_DEPTH),
+        hidden_units=HIDDEN_UNITS,
         n_classes=10,
         config=config,
         model_dir="./tmp/model",
