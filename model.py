@@ -5,6 +5,7 @@ from __future__ import print_function
 import argparse
 import sys
 import time
+import random
 
 import tensorflow as tf
 import numpy as np
@@ -15,6 +16,8 @@ import logging
 logging.getLogger().setLevel(logging.INFO)
 
 from constants import *
+
+percentage_flipped_labels = float(sys.argv[1])
 
 print("\nImporting MNIST dataset...\n")
 
@@ -30,9 +33,20 @@ classifier = tf.estimator.DNNClassifier(
         model_dir="./tmp/model",
 )
 
+# add noise to labels in training set
+labels = np.array(mnist.train.labels).astype(np.int32)
+num_samples = labels.shape[0]
+num_noisy_labels = num_samples * percentage_flipped_labels
+garbled_labels = random.sample(range(num_samples), int(num_noisy_labels))
+for i in garbled_labels:
+	inc_labels = [np.int32(i) for i in range(10)]
+	inc_labels.remove(labels[i])
+
+	labels[i] = random.choice(inc_labels)
+
 train_input_fn = tf.estimator.inputs.numpy_input_fn(
       x={"x": np.array(mnist.train.images)},
-      y=np.array(mnist.train.labels).astype(np.int32),
+      y=labels,
       num_epochs=None,
 	  batch_size=50,
       shuffle=True)
