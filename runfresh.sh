@@ -1,1 +1,1 @@
-mv tmp/model tmp/model_bak && python3 model.py |& tee results.log
+python3 model.py 0.0 0.0 |& tee results.log
