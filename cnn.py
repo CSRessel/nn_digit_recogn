@@ -156,7 +156,7 @@ def main(unused_argv):
       rand = np.random.rand(*x.shape)
       return x * (1. - w) + rand * w
 
-  noisy_test_samples = np.zeros(eval_data.shape)
+  noisy_test_samples = np.zeros(eval_data.shape, dtype=np.float32)
   for i in range(eval_data.shape[0]):
     noisy_test_samples[i] = noisify(eval_data[i], snoise)
 
